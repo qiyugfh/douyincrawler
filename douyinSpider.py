@@ -3,7 +3,7 @@
 import time
 import pymongo
 import logging
-from douyin import *
+
 
 
 
@@ -32,12 +32,13 @@ class DouyinspiderSpider():
                     if now < w['time'] + w['periods'] * 60:
                         logging.warning('website %s not fetch because of time limit !!!' % w['website'])
                         continue
-            douyin = Douyin(w)
-            items = douyin.do_request()
-            if items:
-                # self.insert_update_contents(items)
-                self.collection.update_one({'website': w['website']}, {'$set': {'time': time.time()}})
+            # douyin = Douyin(w)
+            # items = douyin.do_request()
+            # if items:
+            #     # self.insert_update_contents(items)
+            #     self.collection.update_one({'website': w['website']}, {'$set': {'time': time.time()}})
         ws.close()
+
 
     def insert_update_contents(self, items):
         for item in items:

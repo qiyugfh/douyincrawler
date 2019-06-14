@@ -18,6 +18,8 @@ class Follows:
         if self.capture_url in flow.request.url:
             json_msg = json.loads(flow.response.text)
             aweme_list = json_msg['aweme_list'] if 'aweme_list' in json_msg else []
+            print(aweme_list)
+
 
 
 addons = [
