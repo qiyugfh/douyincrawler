@@ -6,11 +6,16 @@ import logging
 
 
 
+'''
+此文件功能为关注抖音账号
+website: 学校的搜索关键字和相关信息配置
+follows: 已关注的抖音号信息 
+'''
 
 class DouyinspiderSpider():
 
     def __init__(self, mSetting):
-        logging.debug(('mongoSetting %s') % mSetting)
+        logging.info(('mongoSetting %s') % mSetting)
         self.name = "douyinSpider"
         self.client = pymongo.MongoClient(mSetting['url'],
                                           username=mSetting['name'],
@@ -43,13 +48,14 @@ class DouyinspiderSpider():
     def insert_update_contents(self, items):
         for item in items:
             data = dict(item)
-            logging.debug("update contents: %s" % data)
+            logging.info("update contents: %s" % data)
             self.contents.update({'website': data['website'], 'websiteName': data['websiteName'], 'id': data['id']}, {'$setOnInsert': data}, True)
 
 
 
 if __name__ != "__main__":
     exit(1)
+
 
 mSetting = {
    "url": "mongodb://localhost:27017/",
@@ -59,7 +65,8 @@ mSetting = {
    "db": 'douyin'
 }
 
+
 spider = DouyinspiderSpider(mSetting)
 spider.start_requests()
 
-logging.debug("download over !!!")
+logging.info("download over !!!")
