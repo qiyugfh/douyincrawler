@@ -3,7 +3,6 @@
 from appium import webdriver
 from appium.webdriver.common.touch_action import TouchAction
 import time
-import logging
 
 
 #连接模拟器或者android手机
@@ -31,12 +30,12 @@ class AppiumDriver:
         # 新建一个Session
         self._driver = webdriver.Remote(server, desired_caps)
         self._driver.implicitly_wait(3)
-        logging.info("连接抖音app成功")
-
+        print("连接抖音app成功")
+        print('success ...')
 
     def __del__(self):
         self._driver.quit()
-        logging.info("退出此次连接")
+        print("退出此次连接")
 
 
     def tap_point(self, x1, y1):
