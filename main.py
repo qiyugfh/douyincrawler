@@ -70,16 +70,19 @@ class DouyinspiderSpider():
 
     def user_posts(self):
         for unique_id in self._appium_douyin.my_follow_user():
-            for aweme in item.getInstance().aweme_list:
+            aweme_list = item.getInstance().aweme_list
+            print('aweme_list : %s' % str(aweme_list))
+            for aweme in aweme_list:
                 d = {}
                 user_id = aweme['author']['uid']
-                us = self._account.find({'url': user_id})
-                if us is None or len(us) != 1:
-                    continue
-                d['crawlerName'] = us['crawlerName']
+                us = self._account.find_one({'url': user_id})
+                if us is None:
+                    us = {}
+                    us['query'] = 'unkown'
+                d['crawlerName'] = '抖音'
                 d['module'] = "抖音视频"
-                d['website'] = us['website']
-                d['websiteName'] = us['name']
+                d['website'] =  us['query'] + '-douyin-' + user_id
+                d['websiteName'] = '抖音-' + aweme['author']['nickname'] + '-' + aweme['author']['unique_id']
                 d['title'] = ''
                 d['query'] = us['query']
                 d['time'] = aweme['create_time'] * 1.0 if 'create_time' in aweme else time.time()
@@ -93,7 +96,7 @@ class DouyinspiderSpider():
                 video = "https://aweme.snssdk.com/aweme/v1/playwm/?video_id=" + video_uri
                 d['videos'] = [{"url": video}]
                 d['url'] = video
-                print("update content: %s" % d)
+                print("update content: %s" % str(d))
                 self._contents.update({'website': d['website'], 'url': d['url']}, {'$setOnInsert': d}, True)
                 # self.postItem(d)
 
@@ -115,7 +118,7 @@ def begin():
         exit(0)
     # spider.follow_accounts()
     spider.user_posts()
-    appium_driver.quit()
+    # appium_driver.quit()
 
 
 print('自动化采集抖音视频的脚本开始执行')

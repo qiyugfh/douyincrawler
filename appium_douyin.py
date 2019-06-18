@@ -27,6 +27,7 @@ class AppiumDouyin:
             try:
                 #主页下方的导航
                 tabbars = self._driver.find_elements_by_id('com.ss.android.ugc.aweme:id/cp7')
+                print("tabbar tab count: %d" % len(tabbars))
                 if tabbars is not None and len(tabbars) == 5:
                     break
             except Exception as e:
@@ -146,34 +147,31 @@ class AppiumDouyin:
             el = self._driver.find_element_by_id('com.ss.android.ugc.aweme:id/adw')
             print('已关注的用户数量为：%s' % el.text)
             el.click()
-            time.sleep(10)
-            elementIds = []
+            time.sleep(30)
             while True:
                 user_els = self._driver.find_elements_by_id("com.ss.android.ugc.aweme:id/au3")
-                print('开始遍历已关注的用户主页')
+                print('开始访问已关注的用户主页')
                 for use_el in user_els:
-                    #已经点击过的用户主页不再重复点击
-                    if use_el.elementId in elementIds:
-                        continue
-                    elementIds.append(use_el.elementId)
                     use_el.click()
                     time.sleep(3)
                     try:
+                        nickname_el = self._driver.find_element_by_id('com.ss.android.ugc.aweme:id/bka')
                         unique_id_el = self._driver.find_element_by_id('com.ss.android.ugc.aweme:id/dcy')
                         unique_id = unique_id_el.text.split(':')[1].strip()
+                        print("正在爬取的用户昵称: %s, 抖音号: %s" % (nickname_el.text, unique_id))
                         yield unique_id
                         self._driver.tap_point(90, 148)
                     except Exception as e:
                         print("进入个人主页面查找抖音号失败")
                         print(e)
                         return False
-                    if self._driver.find_element_by_name('暂时没有更多了') is not None:
-                        self._driver.swipe_to_up(445, 1728, 445, 839)
-                    else:
-                        break
+                if self._driver.find_element_by_name('暂时没有更多了') is None:
+                    self._driver.swipe_to_up(540, 1904, 540, 246)
+                else:
+                    break
             return True
         except Exception as e:
-            print("获取我的关注中的用户列表出现异常")
+            print("获取我关注的用户列表出现异常")
             print(e)
             return False
 

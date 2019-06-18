@@ -54,6 +54,7 @@ class AppiumDriver:
 
 
     def find_element_by_id(self, id):
+        print("find element by id: %s" % id)
         while True:
             try:
                el = self._driver.find_element_by_id(id)
@@ -63,11 +64,13 @@ class AppiumDriver:
                 time.sleep(3)
 
     def find_element_by_id_nowait(self, id):
+        print("find element no wait by id: %s" % id)
         el = self._driver.find_element_by_id(id)
         return el
 
 
     def find_elements_by_id(self, id):
+        print("find elements by id: %s" % id)
         while True:
             try:
                els = self._driver.find_elements_by_id(id)
@@ -78,6 +81,7 @@ class AppiumDriver:
 
 
     def find_element_by_name(self, name):
+        print("find element by name: %s" % name)
         try:
             el = self._driver.find_element_by_name(name)
             return el
