@@ -1,7 +1,6 @@
 # coding: utf-8
 
 
-
 class Item(object):
     crawler = 'appiumDouyin'
     crawlerName = '抖音'
@@ -10,8 +9,16 @@ class Item(object):
     name = '抖音-南京财经大学Mr zou-42514848'
     #抖音帐户ID
     url = '63564898194'
-    periods = 60
+    periods = 1440
     query = 'nufe'
+    user_list = []
+    aweme_list = []
 
 
-item = Item()
+item = None
+def getInstance():
+    global item
+    if item is None:
+        item = Item()
+        print("创建唯一实例的item")
+    return item
