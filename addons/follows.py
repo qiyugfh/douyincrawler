@@ -6,7 +6,6 @@ import json
 import item
 
 
-
 class Follows:
 
     def __init__(self):
@@ -14,10 +13,12 @@ class Follows:
         self._capture_user_post_url = "https://api.amemv.com/aweme/v1/aweme/post/?"
         # 根据关键字搜索出来的用户
         self._capture_search_user_url = "https://api.amemv.com/aweme/v1/discover/search/?"
+        self._ua = 'com.ss.android.ugc.aweme/630 (Linux; U; Android 9; zh_CN; ONEPLUS A5010; Build/PKQ1.180716.001; Cronet/58.0.2991.0)'
 
 
     def request(self, flow: mitmproxy.http.HTTPFlow):
-        pass
+        if flow.request.headers['User-Agent']:
+            flow.request.headers['User-Agent'] = self._ua
 
 
     def response(self, flow: mitmproxy.http.HTTPFlow) -> None:

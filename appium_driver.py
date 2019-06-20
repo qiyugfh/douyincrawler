@@ -4,6 +4,9 @@ from appium import webdriver
 from appium.webdriver.common.touch_action import TouchAction
 import time
 
+import logging
+
+logger = logging.getLogger('appiumDouyin')
 
 #连接模拟器或者android手机
 class AppiumDriver:
@@ -17,10 +20,11 @@ class AppiumDriver:
         desired_caps = {
             "platformName": "Android",
             "platformVersion": "5.1",
-            "udid": "192.168.186.105:5555",
-            "deviceName": "Samsung Galaxy S7",
-            # "udid": "9d5a33ea",
-            # "deviceName": "MI 4C",
+            # "automationName": "uiautomator2",
+            # "udid": "192.168.186.104:5555",
+            # "deviceName": "Samsung Galaxy S6",
+            "udid": "9d5a33ea",
+            "deviceName": "MI 4C",
             "appPackage": "com.ss.android.ugc.aweme",
             "appActivity": "com.ss.android.ugc.aweme.main.MainActivity",
             # 关闭手机软键盘
@@ -36,18 +40,18 @@ class AppiumDriver:
         self._driver = webdriver.Remote(server, desired_caps)
         #当资源未加载出时,最大等待时间(秒)
         self._driver.implicitly_wait(20)
-        print("连接抖音app成功")
+        logger.info("连接抖音app成功")
 
 
     def quit(self):
         if self._driver is not None:
             self._driver.close_app()
             self._driver.quit()
-        print("退出此次连接")
+            logger.info("退出此次连接")
 
 
     def tap(self, x1, y1):
-        print("tap point (%d, %d)" % (x1, y1))
+        logger.info("tap point (%d, %d)" % (x1, y1))
         x0 = self._driver.get_window_size()['width']
         y0 = self._driver.get_window_size()['height']
         x2 = int(x1 * x0 / self._sw)
@@ -57,44 +61,47 @@ class AppiumDriver:
 
 
     def find_element_by_id(self, id):
-        print("find element by id: %s" % id)
+        logger.info("find element by id: %s" % id)
         while True:
             try:
                el = self._driver.find_element_by_id(id)
-               return el
             except Exception as e:
-                print("find element by id: %s fail, %s" % (id, str(e)))
+                logger.error("find element by id: %s fail, %s" % (id, str(e)))
                 time.sleep(3)
+            else:
+                return el
 
     def find_element_by_id_nowait(self, id):
-        print("find element no wait by id: %s" % id)
+        logger.info("find element no wait by id: %s" % id)
         el = self._driver.find_element_by_id(id)
         return el
 
 
     def find_elements_by_id(self, id):
-        print("find elements by id: %s" % id)
+        logger.info("find elements by id: %s" % id)
+        els = []
         while True:
             try:
                els = self._driver.find_elements_by_id(id)
-               return els
             except Exception as e:
-                print("find elements by id: %s fail, %s" % (id, str(e)))
+                logger.error("find elements by id: %s fail, %s" % (id, str(e)))
                 time.sleep(3)
+            else:
+                return els
 
 
     def find_element_by_name(self, name):
-        print("find element by name: %s" % name)
+        logger.info("find element by name: %s" % name)
         try:
             el = self._driver.find_element_by_name(name)
             return el
         except Exception as e:
-            print("find element by name: %s fail, %s" % (name, str(e)))
+            logger.error("find element by name: %s fail, %s" % (name, str(e)))
             return None
 
 
     def swipe(self, startx, starty, endx, endy):
-        print("swipe point (%d, %d) to point(%d, %d)" % (startx, starty, endx, endy))
+        logger.info("swipe point (%d, %d) to point(%d, %d)" % (startx, starty, endx, endy))
         x0 = self._driver.get_window_size()['width']
         y0 = self._driver.get_window_size()['height']
         x1 = int(startx * x0 / self._sw)

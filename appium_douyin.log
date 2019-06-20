@@ -1,0 +1,4 @@
+06-20 16:30 - INFO - 自动化采集抖音视频的脚本开始执行
+06-20 16:30 - INFO - 已启动线程进行处理
+06-20 16:30 - DEBUG - POST http://127.0.0.1:4723/wd/hub/session {"capabilities": {"firstMatch": [{"platformName": "Android", "appium:platformVersion": "5.1", "appium:udid": "9d5a33ea", "appium:deviceName": "MI 4C", "appium:appPackage": "com.ss.android.ugc.aweme", "appium:appActivity": "com.ss.android.ugc.aweme.main.MainActivity", "appium:unicodeKeyboard": true, "appium:resetKeyboard": true, "appium:noReset": true, "appium:newCommandTimeout": 600}]}, "desiredCapabilities": {"platformName": "Android", "platformVersion": "5.1", "udid": "9d5a33ea", "deviceName": "MI 4C", "appPackage": "com.ss.android.ugc.aweme", "appActivity": "com.ss.android.ugc.aweme.main.MainActivity", "unicodeKeyboard": true, "resetKeyboard": true, "noReset": true, "newCommandTimeout": 600}}
+06-20 16:30 - DEBUG - Starting new HTTP connection (1): 127.0.0.1:4723

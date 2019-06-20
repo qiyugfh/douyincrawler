@@ -1,5 +1,8 @@
 # coding: utf-8
 
+import logging
+
+logger = logging.getLogger('appiumDouyin')
 
 class Item(object):
     crawler = 'appiumDouyin'
