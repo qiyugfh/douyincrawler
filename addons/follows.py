@@ -16,6 +16,10 @@ class Follows:
         self._capture_search_user_url = "https://api.amemv.com/aweme/v1/discover/search/?"
 
 
+    def request(self, flow: mitmproxy.http.HTTPFlow):
+        pass
+
+
     def response(self, flow: mitmproxy.http.HTTPFlow) -> None:
         if flow.request.url.startswith(self._capture_user_post_url):
             print("捕捉到的用户主界面的http请求url: %s" % flow.request.url)
