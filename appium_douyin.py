@@ -120,8 +120,8 @@ class AppiumDouyin:
             count = len(els)
             logger.info("获取搜索到的关注按钮个数：%d" % count)
             user_list = item.getInstance().user_list
-            logger.info("user_list: %s" % str(user_list))
-            if 'user_info' not in user_list or len(user_list) < count:
+            logger.debug("======================user_list: %s" % str(user_list))
+            if len(user_list) == 0 or len(user_list) < count:
                 logger.info("获取关键字搜索的结果出现异常")
                 return False
             #每屏最多展示7个，如果需要更多，可以不停地往上滑动
@@ -130,6 +130,7 @@ class AppiumDouyin:
                 if el.text == "关注":
                     el.click()
                     time.sleep(3)
+            logger.info("新关注用户数：%d" % count)
         except Exception as e:
             logger.error("根据关键字搜索用户出现异常, %s" % str(e))
             return False

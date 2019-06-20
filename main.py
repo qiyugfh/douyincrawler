@@ -27,7 +27,7 @@ class DouyinspiderSpider():
         self.name = "douyinSpider"
         self._client = pymongo.MongoClient(mSetting['url'])
         self._websites = self._client[mSetting['db']]['websites']
-        self._account = self._client[mSetting['db']]['account']
+        self._accounts = self._client[mSetting['db']]['accounts']
         self._contents = self._client[mSetting['db']]['contents']
         self._appium_douyin = appium_douyin
         self._reqs = requests.session()
@@ -54,14 +54,18 @@ class DouyinspiderSpider():
             d = {}
             d['crawler'] = item.getInstance().crawler
             d['crawlerName'] = item.getInstance().crawlerName
-            d['periods'] = item.getInstance().periods
-            d['website'] = item.getInstance().website
-            d['query'] = item.getInstance().query
+            d['periods'] = w['periods']
+            d['website'] = w['website']
+            d['query'] = w['query']
             for user_info in item.getInstance().user_list:
+                if 'user_info' not in user_info:
+                    logging.warning("不是有效的用户信息")
+                    continue
                 d['url'] = user_info['user_info']['uid']
                 d['name'] = "抖音-" + user_info['user_info']['nickname'] + "-" + user_info['user_info']['unique_id']
+                d['time'] = time.time()
                 logger.info("update account: %s" % d)
-                self._account.update({'url': d['url']}, {'$setOnInsert': d}, True)
+                self._accounts.update({'url': d['url']}, {'$setOnInsert': d}, True)
             self._websites.update_one({'website': w['website']}, {'$set': {'time': time.time()}})
             # 清空输入框，准备下个关键字的搜索
             self._appium_douyin.search_clear_input()
@@ -69,37 +73,56 @@ class DouyinspiderSpider():
         logger.info("执行关注用户的自动化脚本结束")
 
 
+    def account_upsert(self, uid, nickname, unique_id):
+        us =  self._accounts.find_one({'url': uid})
+        if us is None:
+            itm = item.Item()
+            us = {}
+            us['crawler'] = itm.crawler
+            us['crawlerName'] = itm.crawlerName
+            us['periods'] = itm.periods
+            us['website'] = itm.website
+            us['query'] = ''
+            us['url'] = uid
+            us['name'] = "抖音-" + nickname + "-" + unique_id
+            us['time'] = time.time()
+        logger.info("update account: %s" % us)
+        self._accounts.update({'url': us['url']}, {'$setOnInsert': us}, True)
+        return us
+
+
     def user_posts(self):
         for unique_id in self._appium_douyin.my_follow_user():
             aweme_list = item.getInstance().aweme_list
-            logger.info('aweme_list : %s' % str(aweme_list))
-            # for aweme in aweme_list:
-            #     d = {}
-            #     user_id = aweme['author']['uid']
-            #     us = self._account.find_one({'url': user_id})
-            #     if us is None:
-            #         us = {}
-            #         us['query'] = 'unkown'
-            #     d['crawlerName'] = '抖音'
-            #     d['module'] = "抖音视频"
-            #     d['website'] =  us['query'] + '-douyin-' + user_id
-            #     d['websiteName'] = '抖音-' + aweme['author']['nickname'] + '-' + aweme['author']['unique_id']
-            #     d['title'] = ''
-            #     d['query'] = us['query']
-            #     d['time'] = aweme['create_time'] * 1.0 if 'create_time' in aweme else time.time()
-            #     d['id'] = aweme['aweme_id']
-            #     d['images'] = []
-            #     d['body'] = aweme['desc']
-            #     d['sourceBody'] = aweme
-            #     # 读取视频uri
-            #     video_uri = aweme['video']['play_addr']['uri']
-            #     # 拼接视频地址
-            #     video = "https://aweme.snssdk.com/aweme/v1/playwm/?video_id=" + video_uri
-            #     d['videos'] = [{"url": video}]
-            #     d['url'] = video
-            #     logger.info("update content: %s" % str(d))
-            #     self._contents.update({'website': d['website'], 'url': d['url']}, {'$setOnInsert': d}, True)
-                # self.postItem(d)
+            logger.debug('======================aweme_list : %s' % str(aweme_list))
+            us = {}
+            for aweme in aweme_list:
+                user_id = aweme['author']['uid']
+                nickname = aweme['author']['nickname']
+                unique_id = aweme['author']['unique_id']
+                if len(us) == 0:
+                    us = self.account_upsert(user_id, nickname, unique_id)
+                d = {}
+                d['crawlerName'] = us['crawlerName']
+                d['module'] = "抖音视频"
+                d['website'] =  us['query'] + '-douyin-' + user_id
+                d['websiteName'] = '抖音-' + nickname + '-' + unique_id
+                d['title'] = ''
+                d['query'] = us['query']
+                d['time'] = aweme['create_time'] * 1.0 if 'create_time' in aweme else time.time()
+                d['id'] = aweme['aweme_id']
+                d['images'] = []
+                d['body'] = aweme['desc']
+                d['sourceBody'] = aweme
+                # 读取视频uri
+                video_uri = aweme['video']['play_addr']['uri']
+                # 拼接视频地址
+                video = "https://aweme.snssdk.com/aweme/v1/playwm/?video_id=" + video_uri
+                d['videos'] = [{"url": video}]
+                d['url'] = video
+                logger.info("update content: %s" % str(d))
+                self._contents.update({'website': d['website'], 'url': d['url']}, {'$setOnInsert': d}, True)
+                self.postItem(d)
 
 
     def postItem(self, d):
@@ -118,9 +141,11 @@ def begin():
     if appium_douyin.account_login() is not True:
         logger.info("账户没有登陆，退出执行")
         exit(0)
-    # spider.follow_accounts()
-    spider.user_posts()
-    # appium_driver.quit()
+    #关注根据关键字搜索出来的抖音账户
+    spider.follow_accounts()
+    #爬取已关注的抖音账户下的视频
+    # spider.user_posts()
+    appium_driver.quit()
 
 
 
@@ -128,11 +153,9 @@ def init_logger():
     LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
     logging.basicConfig(level=logging.DEBUG,
                         format=LOG_FORMAT,
-                        datefmt='%m-%d %H:%M',
-                        filename='appium_douyin.log',
-                        filemode='w')
+                        datefmt='%m-%d %H:%M')
     # 定义一个Handler打印INFO及以上级别的日志到sys.stderr
-    console = logging.StreamHandler()
+    console = logging.FileHandler(filename='appium_douyin.log', mode='w', encoding='utf-8')
     console.setLevel(logging.INFO)
     # 设置日志打印格式
     formatter = logging.Formatter(LOG_FORMAT)
