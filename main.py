@@ -42,14 +42,14 @@ class DouyinspiderSpider():
         #websites表中的url
         ws = self._websites.find({'crawler': self.name}, no_cursor_timeout = True)
         for w in ws:
-            # if 'time' in w:
-            #     if w['periods'] == 0:
-            #         logger.info('website %s not fetch !!!' % w['website'])
-            #         continue
-            #     else:
-            #         if now < w['time'] + w['periods'] * 60:
-            #             logger.info('website %s not fetch because of time limit !!!' % w['website'])
-            #             continue
+            if 'time' in w:
+                if w['periods'] == 0:
+                    logger.info('website %s not fetch !!!' % w['website'])
+                    continue
+                else:
+                    if now < w['time'] + w['periods'] * 60:
+                        logger.info('website %s not fetch because of time limit !!!' % w['website'])
+                        continue
             self._appium_douyin.follow_user_list(w['url'])
             d = {}
             d['crawler'] = item.getInstance().crawler
@@ -97,9 +97,11 @@ class DouyinspiderSpider():
             logger.debug('======================aweme_list : %s' % str(aweme_list))
             us = {}
             for aweme in aweme_list:
+                if 'video' not in aweme:
+                    logging.warning("没有视频信息")
+                    continue
                 user_id = aweme['author']['uid']
                 nickname = aweme['author']['nickname']
-                unique_id = aweme['author']['unique_id']
                 if len(us) == 0:
                     us = self.account_upsert(user_id, nickname, unique_id)
                 d = {}
@@ -142,9 +144,9 @@ def begin():
         logger.info("账户没有登陆，退出执行")
         exit(0)
     #关注根据关键字搜索出来的抖音账户
-    spider.follow_accounts()
+    # spider.follow_accounts()
     #爬取已关注的抖音账户下的视频
-    # spider.user_posts()
+    spider.user_posts()
     appium_driver.quit()
 
 

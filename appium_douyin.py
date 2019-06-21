@@ -129,7 +129,7 @@ class AppiumDouyin:
             for el in els:
                 if el.text == "关注":
                     el.click()
-                    time.sleep(3)
+                    time.sleep(5)
             logger.info("新关注用户数：%d" % count)
         except Exception as e:
             logger.error("根据关键字搜索用户出现异常, %s" % str(e))
