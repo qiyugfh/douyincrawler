@@ -85,7 +85,7 @@ class AppiumDouyin:
 
 
     def search_input(self):
-        logger.info('即将在首页根据关键搜索用户账号，并关注')
+        logger.info('即将在首页根据关键搜索')
         #在主界面点击“首页”，进入'首页'
         self.switch_tab(0)
         logger.info('点击主页中的"首页"')
@@ -123,9 +123,9 @@ class AppiumDouyin:
             logger.debug("======================user_list: %s" % str(user_list))
             if len(user_list) == 0 or len(user_list) < count:
                 logger.info("获取关键字搜索的结果出现异常")
-                return False
-            #每屏最多展示7个，如果需要更多，可以不停地往上滑动
-            item.getInstance().user_list = user_list[:count]
+            else:
+                #每屏最多展示7个，如果需要更多，可以不停地往上滑动
+                item.getInstance().user_list = user_list[:count]
             for el in els:
                 if el.text == "关注":
                     el.click()
@@ -196,5 +196,26 @@ class AppiumDouyin:
             logger.error("获取我关注的用户列表出现异常, %s" % str(e))
             return False
 
-
-
+    def search_videos(self, keyword):
+        try:
+            logger.info(("搜索关键字：%s" % keyword))
+            # 输入关键字，点击搜索
+            self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/a8g").send_keys(keyword)
+            self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/d7r").click()
+            time.sleep(2)
+            # 切换到视频的tab页
+            self._appium_driver.tap(291, 284)
+            time.sleep(15)
+            # 向上翻滚10次，每次返回9个视频
+            for i in range(5):
+                i = i + 1
+                yield i
+                # 向上滑动2页面
+                self._appium_driver.swipe(470, 1800, 470, 450)
+                time.sleep(15)
+                self._appium_driver.swipe(470, 1800, 470, 450)
+                time.sleep(15)
+        except Exception as e:
+            logger.error("根据关键字搜索视频出现异常, %s" % str(e))
+            return False
+        return True
