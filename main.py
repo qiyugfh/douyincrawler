@@ -138,7 +138,7 @@ class DouyinspiderSpider():
         unique_id = aweme['author']['unique_id'] if len(aweme['author']['unique_id']) > 0 else aweme['author']['short_id']
         d['websiteName'] = '抖音-' + aweme['author']['nickname'] + '-' + unique_id
         d['title'] = ''
-        d['query'] = 'query'
+        d['query'] = query
         d['time'] = aweme['create_time'] * 1.0 if 'create_time' in aweme else time.time()
         d['id'] = aweme['aweme_id']
         d['images'] = []
