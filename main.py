@@ -124,7 +124,7 @@ class DouyinspiderSpider():
                     if 'video' not in aweme:
                         logging.warning("没有视频信息")
                         continue
-                    self.content_upsert(aweme, ['crawlerName'], w['query'])
+                    self.content_upsert(aweme, w['crawlerName'], w['query'])
         self._ws.close()
         logger.info("执行根据关键字搜索视频的自动化脚本结束")
 
