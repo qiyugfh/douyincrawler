@@ -34,12 +34,12 @@ class DouyinspiderSpider():
         self._reqs.keep_alive = False
         self._reqs.adapters.DEFAULT_RETRIES = 1000
         # websites表中的url
-        # self._ws = self._websites.find({'crawler': self.name}, no_cursor_timeout = True).sort('time', 1)
+        self._ws = self._websites.find({'crawler': self.name}, no_cursor_timeout = True).sort('time', 1)
         # self._ws = self._websites.find({'crawler': self.name, 'time':{'$exists': False}}, no_cursor_timeout=True)
         # self._ws = self._websites.find({'crawler': self.name, 'query':'jiakao'}, no_cursor_timeout=True).sort('time', 1)
-        self._ws = self._websites.find({'crawler': self.name,
-                                  '$or': [{'query': {'$regex': 'siji'}}, {'query': {'$regex': 'liuji'}}]},
-                                 no_cursor_timeout=True).sort('time', -1)
+        # self._ws = self._websites.find({'crawler': self.name,
+        #                           '$or': [{'query': {'$regex': 'siji'}}, {'query': {'$regex': 'liuji'}}]},
+        #                          no_cursor_timeout=True).sort('time', -1)
 
 
     def follow_accounts(self):

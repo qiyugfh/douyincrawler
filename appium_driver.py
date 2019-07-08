@@ -20,7 +20,7 @@ class AppiumDriver:
         desired_caps = {
             "platformName": "Android",
             "platformVersion": "5.1",
-            "automationName": "uiautomator2",
+            # "automationName": "uiautomator2",
             # "udid": "192.168.186.104:5555",
             # "deviceName": "Samsung Galaxy S6",
             "udid": "9d5a33ea",
