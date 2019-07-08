@@ -38,8 +38,7 @@ class DouyinspiderSpider():
         # self._ws = self._websites.find({'crawler': self.name, 'time':{'$exists': False}}, no_cursor_timeout=True)
         # self._ws = self._websites.find({'crawler': self.name, 'query':'jiakao'}, no_cursor_timeout=True).sort('time', 1)
         self._ws = self._websites.find({'crawler': self.name,
-                                  '$or': [{'query': {'$regex': 'siji'}}, {'query': {'$regex': 'liuji'}},
-                                          {'query': {'$regex': 'kaoyan'}}, {'query': {'$regex': 'jiakao'}}]},
+                                  '$or': [{'query': {'$regex': 'siji'}}, {'query': {'$regex': 'liuji'}}]},
                                  no_cursor_timeout=True).sort('time', -1)
 
 
@@ -118,13 +117,18 @@ class DouyinspiderSpider():
         self._appium_douyin.search_input()
         for w in self._ws:
             for i in self._appium_douyin.search_videos(w['url']):
-                aweme_list = item.getInstance().aweme_list
-                logger.debug('===========user search===========aweme_list : %s' % str(aweme_list))
-                for aweme in aweme_list:
-                    if 'video' not in aweme:
-                        logging.warning("没有视频信息")
-                        continue
-                    self.content_upsert(aweme, w['crawlerName'], w['query'])
+               try:
+                    aweme_list = item.getInstance().aweme_list
+                    logger.debug('===========user search===========aweme_list : %s' % str(aweme_list))
+                    for aweme in aweme_list:
+                        if 'video' not in aweme:
+                            logging.warning("没有视频信息")
+                            continue
+                        self.content_upsert(aweme, w['crawlerName'], w['query'])
+               except Exception as e:
+                   logging.error("抓取视频失败")
+                   continue
+
         self._ws.close()
         logger.info("执行根据关键字搜索视频的自动化脚本结束")
 
@@ -134,7 +138,7 @@ class DouyinspiderSpider():
         d['crawlerName'] = crawlerName
         d['module'] = "抖音视频"
         website = query + '-' if len(query) > 0 else ''
-        d['website'] = website + 'douyin-' + aweme['author']['uid']
+        d['website'] = 'douyin-' + website + aweme['author']['uid']
         unique_id = aweme['author']['unique_id'] if len(aweme['author']['unique_id']) > 0 else aweme['author']['short_id']
         d['websiteName'] = '抖音-' + aweme['author']['nickname'] + '-' + unique_id
         d['title'] = ''

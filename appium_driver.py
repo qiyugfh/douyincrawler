@@ -20,7 +20,7 @@ class AppiumDriver:
         desired_caps = {
             "platformName": "Android",
             "platformVersion": "5.1",
-            # "automationName": "uiautomator2",
+            "automationName": "uiautomator2",
             # "udid": "192.168.186.104:5555",
             # "deviceName": "Samsung Galaxy S6",
             "udid": "9d5a33ea",
@@ -28,11 +28,12 @@ class AppiumDriver:
             "appPackage": "com.ss.android.ugc.aweme",
             "appActivity": "com.ss.android.ugc.aweme.main.MainActivity",
             # 关闭手机软键盘
-            # "unicodeKeyboard": True,
+            "unicodeKeyboard": True,
             "resetKeyboard": True,
             # 启动app时不要清除app里的原有的数据
             "noReset": True,
-            "newCommandTimeout": 600
+            "newCommandTimeout": 600,
+            "remoteAdbHost": "localhost"
         }
         # 指定Appium Server
         server = 'http://127.0.0.1:4723/wd/hub'

@@ -109,6 +109,7 @@ class AppiumDouyin:
         try:
             logger.info(("搜索关键字：%s" % keyword))
             # 输入关键字，点击搜索
+            self._appium_driver.tap(269, 147)
             self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/a8g").send_keys(keyword)
             self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/d7r").click()
             time.sleep(2)
@@ -200,11 +201,12 @@ class AppiumDouyin:
         try:
             logger.info(("搜索关键字：%s" % keyword))
             # 输入关键字，点击搜索
+            self._appium_driver.tap(269, 147)
             self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/a8g").send_keys(keyword)
             self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/d7r").click()
             time.sleep(2)
             # 切换到视频的tab页
-            self._appium_driver.tap(291, 284)
+            self._appium_driver.tap(294, 286)
             time.sleep(15)
             # 向上翻滚10次，每次返回9个视频
             for i in range(5):
@@ -215,6 +217,7 @@ class AppiumDouyin:
                 time.sleep(15)
                 self._appium_driver.swipe(470, 1800, 470, 450)
                 time.sleep(15)
+            self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/mq").click()
         except Exception as e:
             logger.error("根据关键字搜索视频出现异常, %s" % str(e))
             return False
