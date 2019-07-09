@@ -160,7 +160,7 @@ class DouyinspiderSpider():
 
 
     def postItem(self, d):
-        url = "http://192.168.1.31:528/crawler"
+        url = "http://192.168.1.31:1528/crawler"
         data = {'json' : json.dumps(d)}
         response = self._reqs.post(url=url, data=data)
         if response is None or response.json()['status'] != 0:
