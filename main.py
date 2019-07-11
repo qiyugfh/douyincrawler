@@ -34,10 +34,12 @@ class DouyinspiderSpider():
         self._reqs.keep_alive = False
         self._reqs.adapters.DEFAULT_RETRIES = 1000
         # websites表中的url
-        self._ws = self._websites.find({'crawler': self.name}, no_cursor_timeout = True).sort('time', 1)
+        self._ws = self._websites.find({'crawler': self.name, 'disabled': {'$exists': False}}, no_cursor_timeout = True).sort('time', 1)
         # self._ws = self._websites.find({'crawler': self.name, 'time':{'$exists': False}}, no_cursor_timeout=True)
         # self._ws = self._websites.find({'crawler': self.name, 'query':'jiakao'}, no_cursor_timeout=True).sort('time', 1)
-        # self._ws = self._websites.find({'crawler': self.name,
+        # s
+        #
+        # elf._ws = self._websites.find({'crawler': self.name,
         #                           '$or': [{'query': {'$regex': 'siji'}}, {'query': {'$regex': 'liuji'}}]},
         #                          no_cursor_timeout=True).sort('time', -1)
 
@@ -128,7 +130,7 @@ class DouyinspiderSpider():
                except Exception as e:
                    logging.error("抓取视频失败")
                    continue
-
+            self._websites.update_one({'website': w['website']}, {'$set': {'time': time.time()}})
         self._ws.close()
         logger.info("执行根据关键字搜索视频的自动化脚本结束")
 
@@ -145,14 +147,14 @@ class DouyinspiderSpider():
         d['query'] = query
         d['time'] = aweme['create_time'] * 1.0 if 'create_time' in aweme else time.time()
         d['id'] = aweme['aweme_id']
-        d['images'] = []
+        d['imageUrls'] = []
         d['body'] = aweme['desc']
         d['sourceBody'] = aweme
         # 读取视频uri
         video_uri = aweme['video']['play_addr']['uri']
         # 拼接视频地址
         video = "https://aweme.snssdk.com/aweme/v1/playwm/?video_id=" + video_uri
-        d['videos'] = [{"url": video}]
+        d['videoUrls'] = [video]
         d['url'] = video
         logger.info("update content: %s" % str(d))
         self._contents.update({'website': d['website'], 'url': d['url']}, {'$setOnInsert': d}, True)
