@@ -157,7 +157,7 @@ class DouyinspiderSpider():
         d['videoUrls'] = [video]
         d['url'] = video
         logger.info("update content: %s" % str(d))
-        self._contents.update({'website': d['website'], 'url': d['url']}, {'$setOnInsert': d}, True)
+        self._contents.update({'id':d['id'], 'website': d['website'], 'url': d['url']}, {'$setOnInsert': d}, True)
         self.postItem(d)
 
 
