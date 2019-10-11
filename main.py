@@ -36,11 +36,9 @@ class DouyinspiderSpider():
         # websites表中的url
         self._ws = self._websites.find({'crawler': self.name, 'disabled': {'$exists': False}}, no_cursor_timeout = True).sort('time', 1)
         # self._ws = self._websites.find({'crawler': self.name, 'time':{'$exists': False}}, no_cursor_timeout=True)
-        # self._ws = self._websites.find({'crawler': self.name, 'query':'jiakao'}, no_cursor_timeout=True).sort('time', 1)
-        # s
-        #
-        # elf._ws = self._websites.find({'crawler': self.name,
-        #                           '$or': [{'query': {'$regex': 'siji'}}, {'query': {'$regex': 'liuji'}}]},
+        # self._ws = self._websites.find({'crawler': self.name, 'website':'douyin-977823453'}, no_cursor_timeout=True).sort('time', 1)
+        # self._ws = self._websites.find({'crawler': self.name,
+        #                           '$or': [{'query': {'$regex': 'xiaokanbiancheng'}}, {'query': {'$regex': 'chengxuyuandadui'}}, {'query': {'$regex': 'woshuodaima'}}]},
         #                          no_cursor_timeout=True).sort('time', -1)
 
 
@@ -58,6 +56,8 @@ class DouyinspiderSpider():
                         logger.info('website %s not fetch because of time limit !!!' % w['website'])
                         continue
             self._appium_douyin.follow_user_list(w['url'])
+
+
             d = {}
             d['crawler'] = item.getInstance().crawler
             d['crawlerName'] = item.getInstance().crawlerName
@@ -67,6 +67,8 @@ class DouyinspiderSpider():
             for user_info in item.getInstance().user_list:
                 if 'user_info' not in user_info:
                     logging.warning("不是有效的用户信息")
+
+
                     continue
                 d['url'] = user_info['user_info']['uid']
                 d['name'] = "抖音-" + user_info['user_info']['nickname'] + "-" + user_info['user_info']['unique_id']
@@ -119,21 +121,38 @@ class DouyinspiderSpider():
         self._appium_douyin.search_input()
         for w in self._ws:
             for i in self._appium_douyin.search_videos(w['url']):
-               try:
-                    aweme_list = item.getInstance().aweme_list
-                    logger.debug('===========user search===========aweme_list : %s' % str(aweme_list))
-                    for aweme in aweme_list:
-                        if 'video' not in aweme:
-                            logging.warning("没有视频信息")
-                            continue
-                        self.content_upsert(aweme, w['crawlerName'], w['query'])
-               except Exception as e:
-                   logging.error("抓取视频失败")
-                   continue
+                if self.parse_content(w) is False:
+                    continue
             self._websites.update_one({'website': w['website']}, {'$set': {'time': time.time()}})
         self._ws.close()
         logger.info("执行根据关键字搜索视频的自动化脚本结束")
 
+
+    def search_videos_by_user_account(self):
+        logger.info("开始执行自动化脚本，爬取根据关键字搜索用户主页人里的视频")
+        self._appium_douyin.search_input()
+        for w in self._ws:
+            if self._appium_douyin.search_videos_by_user_account(w['url']) is False:
+                continue
+            if self.parse_content(w) is False:
+                continue
+            self._websites.update_one({'website': w['website']}, {'$set': {'time': time.time()}})
+        self._ws.close()
+        logger.info("执行根据关键字搜索用户视频的自动化脚本结束")
+
+    def parse_content(self, w):
+        try:
+            aweme_list = item.getInstance().aweme_list
+            logger.debug('===========user search===========aweme_list : %s' % str(aweme_list))
+            for aweme in aweme_list:
+                if 'video' not in aweme:
+                    logging.warning("没有视频信息")
+                    return False
+                self.content_upsert(aweme, w['crawlerName'], w['query'])
+        except Exception as e:
+            logging.error("抓取视频失败")
+            return False
+        return True
 
     def content_upsert(self, aweme, crawlerName, query):
         d = {}
@@ -156,6 +175,7 @@ class DouyinspiderSpider():
         video = "https://aweme.snssdk.com/aweme/v1/playwm/?video_id=" + video_uri
         d['videoUrls'] = [video]
         d['url'] = video
+        d['crawlTime'] = time.time()
         logger.info("update content: %s" % str(d))
         self._contents.update({'id':d['id'], 'website': d['website'], 'url': d['url']}, {'$setOnInsert': d}, True)
         self.postItem(d)
@@ -182,7 +202,9 @@ def begin():
     # 爬取已关注的抖音账户下的视频
     # spider.user_posts()
     # 爬取根据关键字搜索出来的抖音视频
-    spider.search_videos()
+    # spider.search_videos()
+    # 爬取根据关键字搜索出来的用户主页的视频
+    spider.search_videos_by_user_account()
     appium_driver.quit()
 
 

@@ -18,6 +18,7 @@ class Follows:
         self._capture_search_user_url = ".com/aweme/v1/discover/search/?"
         # 根据关键字搜索出来的视频
         self._capture_search_video_url = ".com/aweme/v1/search/item/?"
+
         self._ua = 'com.ss.android.ugc.aweme/630 (Linux; U; Android 9; zh_CN; ONEPLUS A5010; Build/PKQ1.180716.001; Cronet/58.0.2991.0)'
 
 

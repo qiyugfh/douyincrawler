@@ -222,3 +222,27 @@ class AppiumDouyin:
             logger.error("根据关键字搜索视频出现异常, %s" % str(e))
             return False
         return True
+
+    def search_videos_by_user_account(self, keyword):
+        try:
+            logger.info("根据关键字搜索用户账号：%s" % keyword)
+            # 输入关键字，点击搜索
+            self._appium_driver.tap(269, 147)
+            self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/a8g").send_keys(keyword)
+            self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/d7r").click()
+            time.sleep(2)
+            # 切换到用户的tab页
+            self._appium_driver.tap(450, 286)
+            time.sleep(15)
+            # 点击第一个用户
+            self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/b2z").click()
+            time.sleep(15)
+            # 等待爬取用户主页面的视频之后，点击返回
+            self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/il").click()
+            time.sleep(5)
+            # 点击搜索框中的清空
+            self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/mq").click()
+        except Exception as e:
+            logger.error("根据关键字搜索用户视频出现异常, %s" % str(e))
+            return False
+        return True
