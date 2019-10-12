@@ -81,7 +81,6 @@ class DouyinspiderSpider():
         self._ws.close()
         logger.info("执行关注用户的自动化脚本结束")
 
-
     def account_upsert(self, uid, nickname, unique_id):
         us =  self._accounts.find_one({'url': uid})
         if us is None:
@@ -99,7 +98,6 @@ class DouyinspiderSpider():
         self._accounts.update({'url': us['url']}, {'$setOnInsert': us}, True)
         return us
 
-
     def user_posts(self):
         for unique_id in self._appium_douyin.my_follow_user():
             aweme_list = item.getInstance().aweme_list
@@ -115,7 +113,6 @@ class DouyinspiderSpider():
                     us = self.account_upsert(user_id, nickname, unique_id)
                 self.content_upsert(aweme, us['crawlerName'], us['query'])
 
-
     def search_videos(self):
         logger.info("开始执行自动化脚本，爬取根据关键字搜索出来的视频")
         self._appium_douyin.search_input()
@@ -126,7 +123,6 @@ class DouyinspiderSpider():
             self._websites.update_one({'website': w['website']}, {'$set': {'time': time.time()}})
         self._ws.close()
         logger.info("执行根据关键字搜索视频的自动化脚本结束")
-
 
     def search_videos_by_user_account(self):
         logger.info("开始执行自动化脚本，爬取根据关键字搜索用户主页人里的视频")
