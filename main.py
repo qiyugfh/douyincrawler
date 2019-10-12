@@ -130,19 +130,6 @@ class DouyinspiderSpider():
         self._ws.close()
         logger.info("执行根据关键字搜索视频的自动化脚本结束")
 
-    # 爬取根据关键字搜索出来的用户主页的视频
-    def search_videos_by_user_account(self):
-        logger.info("开始执行自动化脚本，爬取根据关键字搜索用户主页人里的视频")
-        self._appium_douyin.search_input()
-        for w in self._ws:
-            if self._appium_douyin.search_videos_by_user_account(w['url']) is False:
-                continue
-            if self.parse_content(w) is False:
-                continue
-            self._websites.update_one({'website': w['website']}, {'$set': {'time': time.time()}})
-        self._ws.close()
-        logger.info("执行根据关键字搜索用户视频的自动化脚本结束")
-
     def parse_content(self, w):
         try:
             aweme_list = item.getInstance().aweme_list
@@ -206,7 +193,6 @@ def begin():
     # spider.user_posts()
     # 爬取根据关键字搜索出来的抖音视频
     spider.search_videos()
-    spider.search_videos_by_user_account()
     appium_driver.quit()
 
 
