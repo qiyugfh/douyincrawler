@@ -199,7 +199,7 @@ class AppiumDouyin:
 
     def search_videos(self, keyword):
         try:
-            logger.info(("搜索关键字：%s" % keyword))
+            logger.info(("根据关键字搜索视频：%s" % keyword))
             # 输入关键字，点击搜索
             self._appium_driver.tap(269, 147)
             self._appium_driver.find_element_by_id("com.ss.android.ugc.aweme:id/a8g").send_keys(keyword)
